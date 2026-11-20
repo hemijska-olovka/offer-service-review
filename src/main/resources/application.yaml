@@ -1,0 +1,51 @@
+spring:
+  datasource:
+    url: ${PG_JDBC_URL:jdbc:postgresql://localhost:55433/offer_state}
+    username: ${PG_USERNAME:offer_app}
+    password: ${PG_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: OfferPostgresPool
+      maximum-pool-size: 4
+      minimum-idle: 1
+      connection-timeout: 5000
+      validation-timeout: 3000
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    validate-on-migrate: true
+    baseline-on-migrate: false
+    clean-disabled: true
+  application:
+    name: offer-backend-service
+  server:
+    port: ${SERVER_PORT:8088}
+  kafka:
+    # Kafka broker connection
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    security:
+      protocol: PLAINTEXT
+    # Kafka consumer configuration
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP_ID:offer-backend-service}
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      enable-auto-commit: false
+
+    # Kafka listener configuration
+    listener:
+      auto-startup: false
+      ack-mode: manual_immediate
+      concurrency: 1
+  # Application-specific configuration
+offer:
+  kafka:
+    topics:
+      market: market
+      event: event
+  initial-state:
+    markets-path: ${OFFER_INITIAL_MARKETS_PATH:./data/initial-state-market.json}
+    events-path: ${OFFER_INITIAL_EVENTS_PATH:./data/initial-state-event.json}
+  persistence:
+    checkpoint-delay-ms: 15000
+    initial-delay-ms: 15000
